@@ -19,3 +19,14 @@
 
 ### Etapas do código
 <p>Melhor que só deixar o código, é explicar este para aqueles que estão iniciando poderem entender todas as partes envolvidas.</p>
+
+### Primeiro
+<p>Criar o arquivo .csv com a estrutura de URL em uma coluna e Legenda na outra e salvar na mesma pasta do código e salvar o logo ou imagem que será usada na mesma pasta.</p>
+
+### Segundo
+<p>Usaremos as bibliotecas qrcode e a padrão csv e para trabalhar com imagens a pillow, comandos no ambiente python: pip install qrcode e pip install pillow.
+
+Precisamos importar as bibliotecas necessárias na primeira linha de comando</p>
+
+### Terceiro
+<p>Seguir os comentários do código.</p>

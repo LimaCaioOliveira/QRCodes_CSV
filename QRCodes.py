@@ -6,8 +6,9 @@ from PIL import Image #para trabalhar com imagens pillow
 from qrcode import QRCode, constants
 
 #Definir o csv para gerar vários qrcodes e o caminho de saída
-arquivo_csv = "C:\Users\vt418428\Códigos\QRCodes\Modelo_CSV.csv"
-saida = "C:\Users\vt418428\Códigos\QRCodes\QRGerados"
+arquivo_csv = "C:\Users\vt418428\Códigos\QRCodes\Modelo_CSV.csv" #esse é a planilha que usaremos
+saida = "C:\Users\vt418428\Códigos\QRCodes\QRGerados" #caminho de sáida para salvar os qrcodes
+logo = "C:\Users\vt418428\Códigos\QRCodes\vtal logo.png" #logo que usaremos
 
 
 #Função para gerar os qrcodes
@@ -47,4 +48,26 @@ def gerar_qrcode(arquivo_csv, saida):
             qr_with_legenda.paste(legenda_img, (0, qr_img_height))
             qr_with_legenda.paste(legenda_text, (0, qr_img_height))
             
+            #Colocar o logo
+            logotipo_path = "C:\Users\vt418428\Códigos\QRCodes\vtal logo.png"
+            logotipo = Image.open(logotipo_path)
+            logotipo_width, logotipo_height = logotipo.size
             
+            #Achar a posição central
+            pos_x = int((qr_img_width - logotipo_width)/2)
+            pos_y = int((qr_img_height - logotipo_height)/2)
+            
+            #Adicionando o logo no qr
+            qr_with_logotipo = qr_with_legenda.copy()
+            qr_with_logotipo.paste(logotipo, (pos_x, pos_y), logotipo)
+            
+            #Nome do qr
+            nome_arquivo = f"{legenda}.png"
+            caminho_saida = os.path.join(saida, nome_arquivo)
+            
+            #Salvando
+            qr_with_logotipo.save(saida)
+            
+
+#Bora chamar a função!
+gerar_qrcode(arquivo_csv, saida)

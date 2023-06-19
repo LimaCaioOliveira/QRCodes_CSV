@@ -1,73 +1,68 @@
 #instalar qrcode e pillow pip install qrcode & pip install pillow
 #Primeiramente devemos importar as bibliotecas necessárias
-import csv #importar a biblioteca padrão csv
-import os
-from PIL import Image #para trabalhar com imagens pillow
-from qrcode import QRCode, constants
+import csv
+from PIL import Image, ImageDraw, ImageFont
+import qrcode
 
-#Definir o csv para gerar vários qrcodes e o caminho de saída
-arquivo_csv = "C:\Users\vt418428\Códigos\QRCodes\Modelo_CSV.csv" #esse é a planilha que usaremos
-saida = "C:\Users\vt418428\Códigos\QRCodes\QRGerados" #caminho de sáida para salvar os qrcodes
-logo = "C:\Users\vt418428\Códigos\QRCodes\vtal logo.png" #logo que usaremos
-
-
-#Função para gerar os qrcodes
-def gerar_qrcode(arquivo_csv, saida):
-    #Segurança para funcionalidade do código: verificar se há a pasta de saída
-    if not os.path.exists(saida):
-        os.makedirs(saida)
-        
-    #Ler o CSV
-    with open(arquivo_csv, "r") as csv_file:
-        reader = csv.DictReader(csv_file)
+def gerar_qrcode(arquivo_csv, pasta_saida, fonte_path):
+    #Abrir o arquivo CSV
+    with open(arquivo_csv, newline='') as file:
+        #Para resolver o problema do excel usando ; no csv
+        reader = csv.DictReader(file, delimiter=';')
+        #Iterando por todas as linhas do csv
         for row in reader:
-            url = row["URL"]
-            legenda = row["Legenda"]
+            #legenda e conteúdo do qrcode
+            legenda = row['Legenda']
+            conteudo_qr = row['URL']
             
-            #criar o qrcode
-            qr=QRCode(
-                version=1,
-                error_correction=constants.ERROR_CORRECT_L,
-                box_size=20,
-                border=4,
-            )
-            
-            qr.add_data(url)
+            #Criando o objeto do qrcode
+            qr = qrcode.QRCode(
+                version=1, 
+                error_correction=qrcode.constants.ERROR_CORRECT_L, 
+                box_size=800, 
+                border=8
+                )
+            qr.add_data(conteudo_qr)
             qr.make(fit=True)
             
-            #Imagem do qr
-            qr_img = qr.make_image(fill_color="black", back_color="white")
-            
-            #Para diferenciar os qrcodes, gerar uma legenda padrão abaixo deles lida no csv
-            qr_img_width, qr_img_height = qr_img.size
-            legenda_img = Image.new("RGB", (qr_img_width, 30), color=(255, 255, 255))
-            legenda_text = Image.new("RGB", (qr_img_width, qr_img_height + 30))
-            legenda_text.paste(qr_img, (10, 5))
-            qr_with_legenda = Image.new("RGB", (qr_img_width, qr_img_height + 30))
-            qr_with_legenda.paste(qr_img, (0,0))
-            qr_with_legenda.paste(legenda_img, (0, qr_img_height))
-            qr_with_legenda.paste(legenda_text, (0, qr_img_height))
-            
-            #Colocar o logo
-            logotipo_path = "C:\Users\vt418428\Códigos\QRCodes\vtal logo.png"
-            logotipo = Image.open(logotipo_path)
-            logotipo_width, logotipo_height = logotipo.size
-            
-            #Achar a posição central
-            pos_x = int((qr_img_width - logotipo_width)/2)
-            pos_y = int((qr_img_height - logotipo_height)/2)
-            
-            #Adicionando o logo no qr
-            qr_with_logotipo = qr_with_legenda.copy()
-            qr_with_logotipo.paste(logotipo, (pos_x, pos_y), logotipo)
-            
-            #Nome do qr
-            nome_arquivo = f"{legenda}.png"
-            caminho_saida = os.path.join(saida, nome_arquivo)
-            
-            #Salvando
-            qr_with_logotipo.save(saida)
-            
+            #Imagem do qrcode
+            qr_img = qr.make_image(fill_color="black", back_color="#DCDCDC")
+            qr_img = qr_img.convert("RGBA")
+            qr_img = qr_img.resize((500, 500), Image.LANCZOS)
 
-#Bora chamar a função!
-gerar_qrcode(arquivo_csv, saida)
+            #Carregar o logotipo
+            logotipo = Image.open("C:\\Users\\vt418428\\Códigos\\QRCodes\\vtal_white.png").convert("RGBA")
+            logotipo_width, logotipo_height = logotipo.size
+            logotipo_max_size = min(qr_img.size) // 4
+            logotipo_resized = logotipo.resize((5, 5), Image.LANCZOS)
+
+            if logotipo_width > logotipo_max_size or logotipo_height > logotipo_max_size:
+                logotipo.thumbnail((logotipo_max_size, logotipo_max_size), Image.LANCZOS)
+                logotipo_width, logotipo_height = logotipo.size
+
+            logotipo_pos_x = (qr_img.size[0] - logotipo_width) // 2
+            logotipo_pos_y = (qr_img.size[1] - logotipo_height) // 2
+
+            qr_img.paste(logotipo, (logotipo_pos_x, logotipo_pos_y), logotipo)
+
+            draw = ImageDraw.Draw(qr_img)
+            fonte = ImageFont.truetype(fonte_path, 12)
+            legenda_width, legenda_height = fonte.getsize(legenda)
+            legenda_pos_x = (qr_img.size[0] - legenda_width) // 2
+            legenda_pos_y = qr_img.size[1] + 10
+            legenda_box = (legenda_pos_x, legenda_pos_y, legenda_pos_x + legenda_width, legenda_pos_y + legenda_height)
+            draw.text((legenda_pos_x, legenda_pos_y), legenda, font=fonte, fill="black")
+
+            
+            
+            nome_arquivo = f"{legenda}.png"
+            caminho_arquivo = f"{pasta_saida}/{nome_arquivo}"
+            qr_img.save(caminho_arquivo)
+
+            print(f"QR code gerado: {caminho_arquivo}")
+
+arquivo_csv = "C:\\Users\\vt418428\\Códigos\\QRCodes\\Modelo_CSV.csv"  # Insira o caminho correto do arquivo CSV
+pasta_saida = "C:\\Users\\vt418428\\Códigos\\QRCodes\\QRGerados"  # Insira o caminho correto da pasta de saída
+fonte_path = "C:\\Windows\\Fonts\\arial.ttf"  # Insira o caminho correto do arquivo de fonte TrueType
+
+gerar_qrcode(arquivo_csv, pasta_saida, fonte_path)

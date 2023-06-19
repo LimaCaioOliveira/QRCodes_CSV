@@ -35,18 +35,19 @@ def gerar_qrcode(arquivo_csv, pasta_saida, fonte_path):
             logotipo_width, logotipo_height = logotipo.size
             logotipo_max_size = min(qr_img.size) // 4
             logotipo_resized = logotipo.resize((5, 5), Image.LANCZOS)
-
+            #Redimensionamento do logotipo
             if logotipo_width > logotipo_max_size or logotipo_height > logotipo_max_size:
                 logotipo.thumbnail((logotipo_max_size, logotipo_max_size), Image.LANCZOS)
                 logotipo_width, logotipo_height = logotipo.size
-
+            #posicionamento do logotipo
             logotipo_pos_x = (qr_img.size[0] - logotipo_width) // 2
             logotipo_pos_y = (qr_img.size[1] - logotipo_height) // 2
-
+            #Colar o logotipo no qrcode
             qr_img.paste(logotipo, (logotipo_pos_x, logotipo_pos_y), logotipo)
-
+            #Fonte da legenda
             draw = ImageDraw.Draw(qr_img)
             fonte = ImageFont.truetype(fonte_path, 12)
+            #Tamanho e posicionamento da legenda
             legenda_width, legenda_height = fonte.getsize(legenda)
             legenda_pos_x = (qr_img.size[0] - legenda_width) // 2
             legenda_pos_y = qr_img.size[1] + 10
@@ -54,13 +55,13 @@ def gerar_qrcode(arquivo_csv, pasta_saida, fonte_path):
             draw.text((legenda_pos_x, legenda_pos_y), legenda, font=fonte, fill="black")
 
             
-            
+            #Para salvar o arquivo com o nome da legenda
             nome_arquivo = f"{legenda}.png"
             caminho_arquivo = f"{pasta_saida}/{nome_arquivo}"
             qr_img.save(caminho_arquivo)
 
             print(f"QR code gerado: {caminho_arquivo}")
-
+#os caminhos dos arquivos, saída e fonte para a legenda
 arquivo_csv = "C:\\Users\\vt418428\\Códigos\\QRCodes\\Modelo_CSV.csv"  # Insira o caminho correto do arquivo CSV
 pasta_saida = "C:\\Users\\vt418428\\Códigos\\QRCodes\\QRGerados"  # Insira o caminho correto da pasta de saída
 fonte_path = "C:\\Windows\\Fonts\\arial.ttf"  # Insira o caminho correto do arquivo de fonte TrueType

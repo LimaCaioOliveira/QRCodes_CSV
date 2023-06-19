@@ -46,11 +46,11 @@ def gerar_qrcode(arquivo_csv, pasta_saida, fonte_path):
             qr_img.paste(logotipo, (logotipo_pos_x, logotipo_pos_y), logotipo)
             #Fonte da legenda
             draw = ImageDraw.Draw(qr_img)
-            fonte = ImageFont.truetype(fonte_path, 12)
+            fonte = ImageFont.truetype(fonte_path, 20)
             #Tamanho e posicionamento da legenda
             legenda_width, legenda_height = fonte.getsize(legenda)
             legenda_pos_x = (qr_img.size[0] - legenda_width) // 2
-            legenda_pos_y = qr_img.size[1] + 10
+            legenda_pos_y = qr_img.size[1] + 20
             legenda_box = (legenda_pos_x, legenda_pos_y, legenda_pos_x + legenda_width, legenda_pos_y + legenda_height)
             draw.text((legenda_pos_x, legenda_pos_y), legenda, font=fonte, fill="black")
 
